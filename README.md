@@ -8,11 +8,11 @@ Make sure to have pylsl installed; execute `pip install pylsl` or see the [libls
 Run `PortMarkers2LSL.py` and enter the requested protocol, port, et cetera.
 Alternatively, run `PortMarkers2LSL.py` with additional arguments:
 
-`--protocol:` should be either `udp` or `tcp`.
-`--port:` the port to be used, 0 - 65535.
-`--address:` address of the host.
-`--bufsize:` size of the socket buffer (optional; default 16).
-`--printdata:` whether or not to also print incoming data to the console (as boolean 0 or 1; optional; default 1).
+* `--protocol:` should be either `udp` or `tcp`.
+* `--port:` the port to be used, 0 - 65535.
+* `--address:` address of the host.
+* `--bufsize:` size of the socket buffer (optional; default 16).
+* `--printdata:` whether or not to also print incoming data to the console (as boolean 0 or 1; optional; default 1).
 
 For example:
 
