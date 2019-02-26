@@ -4,7 +4,7 @@
 """
 PortMarkers2LSL 0.2.1
 
-Copyright 2018, 2019 Laurens R Krol
+Copyright 2017, 2019 Laurens R Krol
 
     Team PhyPA, Biological Psychology and Neuroergonomics,
     Technische Universitaet Berlin
