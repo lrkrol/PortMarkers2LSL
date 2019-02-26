@@ -20,3 +20,5 @@ For example:
 
 starts a marker stream relaying data coming through UDP at 127.0.0.1,
 port 5005, with default buffer size of 16 and output to the console.
+
+Note that `bufsize` is **optional but important**: if the size of the message sent to the socket is larger than the buffer, an error will be produced, the data will be rejected, and an `ERROR` marker will be sent instead.

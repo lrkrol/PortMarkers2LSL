@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-PortMarkers2LSL 0.2.0
+PortMarkers2LSL 0.2.1
 
 Copyright 2018, 2019 Laurens R Krol
 
@@ -47,6 +47,18 @@ For example:
 
 starts a marker stream relaying data coming through UDP at 127.0.0.1,
 port 5005, with default buffer size of 16 and output to the console.
+
+Note that bufsize is optional but important: if the size of the message sent 
+to the socket is larger than the buffer, an error will be produced, the data
+will be rejected, and an 'ERROR' marker will be sent instead.
+"""
+
+"""
+2019-02-26 0.2.1 lrk
+- Caught socket recv exceptions
+- Made recv call non-blocking
+- Made bufsize and printdata optional
+2017-11-23 0.1.0 First version
 """
 
 
@@ -70,7 +82,7 @@ def main(protocol, address, port, bufsize, printdata, sockettimeout):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((address, port))
         except socket.error, msg:
-            sys.stdout.write("Socket error:\n%s" % msg)
+            print "Socket error:\n%s" % msg
             sys.exit()    
 
     # opening stream outlet
@@ -87,15 +99,19 @@ def main(protocol, address, port, bufsize, printdata, sockettimeout):
     print '+-' + ''.join(['-' for _ in msg]) + '-+'
 
     try:
-        print("Waiting for data...")
+        print 'Waiting for data...'
         while True:
             # waiting for data
             ready = select.select([sock], [], [], sockettimeout)
             if ready[0]:
-                if protocol == 'tcp':
-                    data = sock.recv(bufsize)
-                elif protocol == 'udp':
-                    data, addr = sock.recvfrom(bufsize)
+                try:
+                    if protocol == 'tcp':
+                        data = sock.recv(bufsize)
+                    elif protocol == 'udp':
+                        data, addr = sock.recvfrom(bufsize)    
+                except socket.error, msg:
+                    print 'Socket error: %s' % msg
+                    data = 'ERROR'
                 
                 # sending marker
                 if data:
@@ -143,19 +159,19 @@ if __name__ == "__main__":
         address = raw_input('> ')
 
     # requesting optional info only if nothing has been preset
-    if len(sys.argv) == 1:
-        # setting buffer length
-        if('--bufsize' in sys.argv):
-            bufsize = int(sys.argv[sys.argv.index('--bufsize') + 1])
-        else:
-            print '\nBuffer length (default 16):\n'
-            bufsize = int(raw_input('> ') or bufsize)
-            
-        # setting print option
-        if('--printdata' in sys.argv):
-            printdata = int(sys.argv[sys.argv.index('--bufsize') + 1])
-        else:
-            print '\n  [0] Do not print incoming data\n  [1] Print incoming data (default)\n'
-            printdata = int(raw_input('> ') or printdata)
+    
+    # setting buffer length
+    if('--bufsize' in sys.argv):
+        bufsize = int(sys.argv[sys.argv.index('--bufsize') + 1])
+    elif len(sys.argv) == 1:
+        print '\nBuffer length (default 16):\n'
+        bufsize = int(raw_input('> ') or bufsize)
+        
+    # setting print option
+    if('--printdata' in sys.argv):
+        printdata = int(sys.argv[sys.argv.index('--bufsize') + 1])
+    elif len(sys.argv) == 1:
+        print '\n  [0] Do not print incoming data\n  [1] Print incoming data (default)\n'
+        printdata = int(raw_input('> ') or printdata)
         
     main(protocol, address, port, bufsize, printdata, sockettimeout)
